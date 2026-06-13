@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+.next/
+.turbo/
+dist/
+build/
+out/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.production
+!.env.example
+
+# TypeORM
+apps/api/src/migrations/*.js
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+
+# Docker volumes
+postgres_data/
+redis_data/
+rabbitmq_data/
+strapi_data/
+
+# Uploads (local dev)
+apps/api/uploads/
+
+# PWA
+apps/web/public/sw.js
+apps/web/public/workbox-*.js
+apps/web/public/sw.js.map
+apps/web/public/workbox-*.js.map
+
+# Next.js
+apps/web/.next/
+apps/web/out/
+
+# Strapi
+apps/strapi/.tmp/
+apps/strapi/build/
+apps/strapi/.cache/
+
+# TypeScript
+*.tsbuildinfo
