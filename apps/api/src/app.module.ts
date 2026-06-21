@@ -35,19 +35,29 @@ import { StoreLocationsModule } from './store-locations/store-locations.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        database: config.get<string>('DB_NAME'),
-        username: config.get<string>('DB_USER'),
-        password: config.get<string>('DB_PASSWORD'),
-        synchronize: false,
-        autoLoadEntities: true,
-        migrations: ['dist/migrations/*.js'],
-        migrationsRun: false,
-        logging: config.get('NODE_ENV') === 'development',
-      }),
+      useFactory: (config: ConfigService) => {
+        const databaseUrl = config.get<string>('DATABASE_URL');
+        const base = {
+          type: 'postgres' as const,
+          synchronize: false,
+          autoLoadEntities: true,
+          migrations: ['dist/migrations/*.js'],
+          migrationsRun: false,
+          logging: config.get('NODE_ENV') === 'development',
+          ssl: databaseUrl ? { rejectUnauthorized: false } : false,
+        };
+        if (databaseUrl) {
+          return { ...base, url: databaseUrl };
+        }
+        return {
+          ...base,
+          host: config.get<string>('DB_HOST', 'localhost'),
+          port: config.get<number>('DB_PORT', 5432),
+          database: config.get<string>('DB_NAME'),
+          username: config.get<string>('DB_USER'),
+          password: config.get<string>('DB_PASSWORD'),
+        };
+      },
     }),
 
     ServeStaticModule.forRoot({
