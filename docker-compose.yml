@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: nooremoon_postgres
+    environment:
+      POSTGRES_DB: nooremoon_db
+      POSTGRES_USER: nooremoon
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nooremoon"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: nooremoon_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: nooremoon_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  strapi:
+    image: node:20-alpine
+    container_name: nooremoon_strapi
+    working_dir: /srv/strapi
+    command: sh -c "npx create-strapi-app@latest . --quickstart --no-run 2>/dev/null || true && npm run develop"
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: nooremoon_strapi
+      DATABASE_USERNAME: nooremoon
+      DATABASE_PASSWORD: 123456
+      JWT_SECRET: strapi-jwt-secret-change-me
+      APP_KEYS: strapi-app-key-1,strapi-app-key-2
+      API_TOKEN_SALT: strapi-api-token-salt
+      ADMIN_JWT_SECRET: strapi-admin-jwt-secret
+    ports:
+      - "1337:1337"
+    volumes:
+      - strapi_data:/srv/strapi
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+  rabbitmq_data:
+  strapi_data:
