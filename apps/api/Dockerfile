@@ -5,16 +5,15 @@ RUN npm install -g pnpm
 WORKDIR /app
 
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
-COPY turbo.json ./
 COPY apps/api/package.json ./apps/api/
 COPY packages/shared/package.json ./packages/shared/
 
 RUN pnpm install --frozen-lockfile
 
+# Copy source — shared dist is pre-built and committed to git
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
 
-RUN cd packages/shared && pnpm run build 2>/dev/null || true
 RUN cd apps/api && pnpm run build
 
 # ── Production image ───────────────────────────────────────────────────
@@ -22,7 +21,6 @@ FROM node:20-alpine AS runner
 
 RUN npm install -g pnpm
 
-# Keep WORKDIR at /app so "node apps/api/dist/main.js" path is correct
 WORKDIR /app
 
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
@@ -31,8 +29,9 @@ COPY packages/shared/package.json ./packages/shared/
 
 RUN pnpm install --frozen-lockfile --prod
 
+# Copy compiled API and the pre-built shared dist
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
-COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
+COPY packages/shared/dist ./packages/shared/dist
 
 RUN mkdir -p apps/api/uploads/products
 

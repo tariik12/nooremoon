@@ -10,6 +10,9 @@ dist/
 build/
 out/
 
+# Keep pre-built shared package dist for Docker deployments
+!packages/shared/dist/
+
 # Environment files
 .env
 .env.local
