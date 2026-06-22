@@ -185,7 +185,8 @@ export interface ProductList {
 }
 
 export function formatPrice(cents: number): string {
-  return `$${(cents / 100).toFixed(2)}`;
+  const taka = Math.round(cents / 100);
+  return `৳${taka.toLocaleString('en-US')}`;
 }
 
 // ── Cart API ────────────────────────────────────────────────────────────────
