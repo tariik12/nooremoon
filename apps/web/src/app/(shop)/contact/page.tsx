@@ -12,7 +12,7 @@ export const metadata = {
 export default async function ContactPage() {
   const settings = await fetchSettings();
 
-  const phone   = settings.support_phone   ?? '09666774577';
+  const phone   = settings.support_phone   ?? '09644441441';
   const email   = settings.support_email   ?? 'support@nooremoon.com';
   const hours   = settings.support_hours   ?? '09:00 AM – 06:00 PM';
 
